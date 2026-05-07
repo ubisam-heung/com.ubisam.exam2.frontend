@@ -8,11 +8,13 @@
     "dev.boilerplate":  "vite --mode dev.boilerplate",
     "dev.examples":  "vite --mode dev.examples",
     "dev.frontend": "vite --mode dev.frontend",
+    "dev.farm": "vite --mode dev.farm",
 
     "build": "vite build --mode build",
     "build.boilerplate":  "vite build --mode build.boilerplate",
     "build.examples":  "vite build --mode build.examples",
     "build.frontend": "vite build --mode build.frontend",
+    "build.farm": "vite build --mode build.farm",
     
     "preview": "vite preview",
     "lint": "eslint . --fix"
