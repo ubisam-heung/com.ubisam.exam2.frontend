@@ -38,20 +38,29 @@
             "bar" : {
                 "title" : "Contents :: "
             },
-            "foos" : {
-                "title" : "Foos"
+            "farms" : {
+                "title" : "Farms"
             },
-            "bars" : {
-                "title" : "Bars"
+            "farmPlants" : {
+                "title" : "Farm Plants"
             },
-            "items" : {
-                "title" : "Items"
+            "farmDevices" : {
+                "title" : "Farm Devices"
+            },
+            "farmDeviceTypes" : {
+                "title" : "Farm Device Types"
             },
             "sessions" : {
                 "title" : "Sessions"
             },
+            "devices" : {
+                "title" : "Devices"
+            },
             "accounts" : {
-                "title" : "Accounts"
+                "title" : "Every Accounts"
+            },
+            "userAccount" : {
+                "title" : "My Account"
             }
         } 
 
