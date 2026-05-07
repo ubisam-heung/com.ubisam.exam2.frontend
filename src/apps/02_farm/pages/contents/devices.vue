@@ -3,7 +3,7 @@
     <v-card>
       <v-card-title class="d-flex align-center pe-2">
         <v-icon icon="mdi-video-input-component"></v-icon> &nbsp;
-        {{ $t("frontend.contents.sessions.title") }}&nbsp;
+        {{ $t("frontend.contents.devices.title") }}&nbsp;
         <!-- 
         //////////////////////////
         // Search Field Start
@@ -49,8 +49,7 @@
         # Table Cell Template Start
         //////////////////////////
         -->
-
-        <template v-slot:item.timestamp="{ item }">
+        <template v-slot:item.updated.timestamp="{ item }">
           {{ $moment.format(item.timestamp) }}
         </template>
         <!-- 
@@ -75,9 +74,8 @@
 
 
 <script>
-const x = "[/contents/sessions]";
+const x = "[/contents/devices]";
 import $farmServer from "@@/assets/apis/farm-server.js";
-import $stompServer from "@@/assets/apis/stomp-server";
 import $common from "@@/assets/stores/common";
 
 export default {
@@ -370,34 +368,10 @@ export default {
           return this.actionEnd(true);
         });
     },
-
-    messageReceived(m, p){
-      console.log(x, "messageReceived()", m, p);
-    }
   },
 
   mounted() {
     this.subtitle = x;
-
-    $stompServer.$stompServer
-      .connect()
-      .then((r) => {
-        console.log(x, "mounted()", 1, r);
-        $stompServer.stomp.subscribe("/topic/sessions", this.refreshAction);
-      })
-      .catch((r) => {
-        console.log(x, "mounted()", 2);
-      })
-      .then((r) => {
-        console.log(x, "mounted()", 3, r);
-        setTimeout(() => {
-          this.refreshAction();
-        }, 100);
-      });
   },
-
-  beforeUnmount(){
-    $stompServer.stomp.disconnect();
-  }
 };
 </script>
