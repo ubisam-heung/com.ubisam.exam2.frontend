@@ -1,7 +1,7 @@
 <template>
   <v-container class="text-center">
     <v-btn variant="outlined" block size="x-large" @click="login">
-      {{  $t("accounts.login.title") }}
+      {{  $t("accounts.logoff.title") }}
     </v-btn>
   </v-container>
 </template>
