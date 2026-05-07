@@ -31,7 +31,7 @@
 
     "frontend" : {
         "index" : {
-            "title" : "U2ware Examples",
+            "title" : "U2ware Farm",
             "start" : "시작하기"
         },
         "contents" : {
