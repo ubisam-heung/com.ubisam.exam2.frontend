@@ -133,8 +133,8 @@
                 hint="......."
                 variant="outlined"
                 :items="farmDeviceTypeItems"
-                :items-title="item => item.farmDeviceTypeName + ' (' + item.farmDeviceTypeKey + ')'"
-                item-value="farmDeviceTypeKey"
+                :item-title="item => item.farmDeviceTypeName + ' (' + item.farmDeviceTypeKey + ')'"
+                item-value="farmDeviceTypeName"
                 :loading="farmDeviceTypeItemsLoading"
                 @click="farmDeviceTypeItemsQuery"
               >
@@ -265,7 +265,7 @@ export default {
 
       $farmServer.farmDeviceTypes.search({}, {})
       .then(r => {
-        console.log(x, "farmDeviceItemsQuery", 2, r);
+        console.log(x, "farmDeviceTypeItemsQuery", 2, r);
         this.farmDeviceTypeItems = r._embedded.farmDeviceTypes;
         this.farmDeviceTypeItemsLoading = false;
       })

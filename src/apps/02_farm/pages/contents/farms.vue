@@ -72,11 +72,11 @@
             @click="readAction(item)"
           ></v-btn>
         </template>
-        <template v-slot:item.farmDevices="{ item }">
-          {{ item.farmDevices ? item.farmDevices.farmDeviceSerial : "-" }}
-        </template>
         <template v-slot:item.farmPlants="{ item }">
-          {{ item.farmPlants ? item.farmPlants.farmPlantName : "-" }}
+          {{ item.farmPlants && item.farmPlants.length ? item.farmPlants.map(d => d.farmPlantName).join(", ") : "-" }}
+        </template>
+        <template v-slot:item.farmDevices="{ item }">
+          {{ item.farmDevices && item.farmDevices.length ? item.farmDevices.map(d => d.farmDeviceSerial).join(", ") : "-" }}
         </template>
         <!-- 
         //////////////////////////
@@ -145,7 +145,7 @@
                 :items="farmPlantsItems"
                 :item-selected="editForm.farmPlants"
                 :item-title="farmPlantsItemsTitle"
-                :item-value="ffarmPlantsItemsValue"
+                :item-value="farmPlantsItemsValue"
                 :loading="farmPlantsItemsLoading"
                 @querySelections="farmPlantsItemsQuery"
                 density="default"

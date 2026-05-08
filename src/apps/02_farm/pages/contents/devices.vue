@@ -143,23 +143,23 @@ export default {
     // handle....
     ////////////////////////////////////////
     handleCreate(){
-      return $farmServer.accounts.create(this.editForm);
+      return $farmServer.devices.create(this.editForm);
     },
     handleRead(entity){
-      return $farmServer.accounts.read(entity);
+      return $farmServer.devices.read(entity);
     },
     handleUpdate(){
-      return $farmServer.accounts.update(this.editForm);
+      return $farmServer.devices.update(this.editForm);
     },
     handleDelete(){
-      return $farmServer.accounts.delete(this.editForm);
+      return $farmServer.devices.delete(this.editForm);
     },
     handleSearch(query){
-      return $farmServer.accounts.search(this.searchForm, query);
+      return $farmServer.devices.search(this.searchForm, query);
     },
     handleEntities(res){
       this.entitiesTotal = res.page.totalElements;
-      this.entities = res._embedded.accounts;
+      this.entities = res._embedded.devices;
       return res;
     },
     handleEntity(res){

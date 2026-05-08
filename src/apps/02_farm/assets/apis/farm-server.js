@@ -81,7 +81,7 @@ const $server = {
       return $server.api
         .execute((e) => ({
           method: "POST",
-          url: $server.api.url(e, "/api/farms/search"),
+          url: $server.api.url(e, "/rest/farms/search"),
           headers: $server.api.headers(e, {}),
           params: $server.api.pageable(params),
           data: data,
@@ -91,7 +91,7 @@ const $server = {
       return $server.api
         .execute((e) => ({
           method: "POST",
-          url: $server.api.url(e, "/api/farms"),
+          url: $server.api.url(e, "/rest/farms"),
           headers: $server.api.headers(e, {}),
           data: data,
         }));
@@ -128,7 +128,7 @@ const $server = {
       return $server.api
         .execute((e) => ({
           method: "POST",
-          url: $server.api.url(e, "/api/farmDevices/search"),
+          url: $server.api.url(e, "/rest/farmDevices/search"),
           headers: $server.api.headers(e, {}),
           params: $server.api.pageable(params),
           data: data,
@@ -138,7 +138,7 @@ const $server = {
       return $server.api
         .execute((e) => ({
           method: "POST",
-          url: $server.api.url(e, "/api/farmDevices"),
+          url: $server.api.url(e, "/rest/farmDevices"),
           headers: $server.api.headers(e, {}),
           data: data,
         }));
@@ -175,7 +175,7 @@ const $server = {
       return $server.api
         .execute((e) => ({
           method: "POST",
-          url: $server.api.url(e, "/api/farmDeviceTypes/search"),
+          url: $server.api.url(e, "/rest/farmDeviceTypes/search"),
           headers: $server.api.headers(e, {}),
           params: $server.api.pageable(params),
           data: data,
@@ -185,7 +185,7 @@ const $server = {
       return $server.api
         .execute((e) => ({
           method: "POST",
-          url: $server.api.url(e, "/api/farmDeviceTypes"),
+          url: $server.api.url(e, "/rest/farmDeviceTypes"),
           headers: $server.api.headers(e, {}),
           data: data,
         }));
@@ -222,7 +222,7 @@ const $server = {
       return $server.api
         .execute((e) => ({
           method: "POST",
-          url: $server.api.url(e, "/api/farmPlants/search"),
+          url: $server.api.url(e, "/rest/farmPlants/search"),
           headers: $server.api.headers(e, {}),
           params: $server.api.pageable(params),
           data: data,
@@ -232,7 +232,7 @@ const $server = {
       return $server.api
         .execute((e) => ({
           method: "POST",
-          url: $server.api.url(e, "/api/farmPlants"),
+          url: $server.api.url(e, "/rest/farmPlants"),
           headers: $server.api.headers(e, {}),
           data: data,
         }));
@@ -269,7 +269,7 @@ const $server = {
       return $server.api
         .execute((e) => ({
           method: "POST",
-          url: $server.api.url(e, "/api/accounts/search"),
+          url: $server.api.url(e, "/rest/accounts/search"),
           headers: $server.api.headers(e, {}),
           params: $server.api.pageable(params),
           data: data,
@@ -279,7 +279,7 @@ const $server = {
       return $server.api
         .execute((e) => ({
           method: "POST",
-          url: $server.api.url(e, "/api/accounts"),
+          url: $server.api.url(e, "/rest/accounts"),
           headers: $server.api.headers(e, {}),
           data: data,
         }));
@@ -316,7 +316,7 @@ const $server = {
       return $server.api
         .execute((e) => ({
           method: "POST",
-          url: $server.api.url(e, "/api/devices/search"),
+          url: $server.api.url(e, "/rest/devices/search"),
           headers: $server.api.headers(e, {}),
           params: $server.api.pageable(params),
           data: data,
@@ -326,7 +326,7 @@ const $server = {
       return $server.api
         .execute((e) => ({
           method: "POST",
-          url: $server.api.url(e, "/api/devices"),
+          url: $server.api.url(e, "/rest/devices"),
           headers: $server.api.headers(e, {}),
           data: data,
         }));
@@ -363,7 +363,7 @@ const $server = {
       return $server.api
         .execute((e) => ({
           method: "POST",
-          url: $server.api.url(e, "/api/sessions/search"),
+          url: $server.api.url(e, "/rest/sessions/search"),
           headers: $server.api.headers(e, {}),
           params: $server.api.pageable(params),
           data: data,
@@ -373,7 +373,7 @@ const $server = {
       return $server.api
         .execute((e) => ({
           method: "POST",
-          url: $server.api.url(e, "/api/sessions"),
+          url: $server.api.url(e, "/rest/sessions"),
           headers: $server.api.headers(e, {}),
           data: data,
         }));

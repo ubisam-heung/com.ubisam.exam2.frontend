@@ -83,7 +83,7 @@ const $server = {
       let token = query.id_token;
       return $server.api.execute((e) => ({
         url: $server.api.url(e, "/oauth2/userinfo"),
-        headers: $server.api.headers({}, token),
+        headers: $base.api.headers({}, token),
       }))
       .then(r => {
         $userinfo.computed.oauth2.set(query);

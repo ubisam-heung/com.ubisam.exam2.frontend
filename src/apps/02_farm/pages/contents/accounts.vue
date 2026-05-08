@@ -2,7 +2,7 @@
   <v-container class="pa-4" fluid>
     <v-card>
       <v-card-title class="d-flex align-center pe-2">
-        <v-icon icon="mdi-video-input-component"></v-icon> &nbsp;
+        <v-icon icon="mdi-account"></v-icon> &nbsp;
         {{ $t("frontend.contents.accounts.title") }}&nbsp;
         <!-- 
         //////////////////////////
@@ -169,7 +169,7 @@ export default {
       headers: [
         { key: "id", title: "id", align: "start" },
         { key: "username", title: "username", align: "start" },
-        { key: "providers", title: "provider", align: "end" },
+        { key: "provider", title: "provider", align: "end" },
         { key: "updated.timestamp", title: "updatedTimestamp", align: "end" },
       ],
       sortBy: [
@@ -229,15 +229,16 @@ export default {
       return res;
     },
 
+ 
     ////////////////////////////////////////
     //
     ////////////////////////////////////////
-    dialogOpen(isNew) {
+    dialogOpen(isNew){
       this.dialog = true;
       this.isNew = isNew;
       return "opened";
     },
-    dialogClose() {
+    dialogClose(){
       this.dialog = false;
       this.isNew = false;
       return "closed";
@@ -253,11 +254,11 @@ export default {
       let msg = this.$t(`$dialog.before.${code}`);
       return this.$dialog.confirm(msg);
     },
-    confirmAfter(code) {
+    confirmAfter(code){
       let msg = this.$t(`$dialog.after.${code}`);
       return this.$dialog.alert(msg);
     },
-    confirmError(code) {
+    confirmError(code){
       let msg = this.$t(`$dialog.error.${code}`);
       return this.$dialog.alert(msg, code);
     },
@@ -277,7 +278,6 @@ export default {
         this.refreshAction();
       }
     },
-
     ////////////////////////////////////////
     //
     ////////////////////////////////////////
@@ -301,6 +301,7 @@ export default {
         })
         .catch((e) => {
           console.log(x, "searchAction", 2, e);
+          // this.$router.push("/");
         });
     },
 

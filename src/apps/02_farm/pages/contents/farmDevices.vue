@@ -190,7 +190,7 @@
 
 
 <script>
-const x = "[/contents/farmDeviceType]";
+const x = "[/contents/farmDevice]";
 import $farmServer from "@@/assets/apis/farm-server.js";
 import $common from "@@/assets/stores/common";
 

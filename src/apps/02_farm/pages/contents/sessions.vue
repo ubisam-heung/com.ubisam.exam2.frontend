@@ -145,23 +145,23 @@ export default {
     // handle....
     ////////////////////////////////////////
     handleCreate(){
-      return $farmServer.accounts.create(this.editForm);
+      return $farmServer.sessions.create(this.editForm);
     },
     handleRead(entity){
-      return $farmServer.accounts.read(entity);
+      return $farmServer.sessions.read(entity);
     },
     handleUpdate(){
-      return $farmServer.accounts.update(this.editForm);
+      return $farmServer.sessions.update(this.editForm);
     },
     handleDelete(){
-      return $farmServer.accounts.delete(this.editForm);
+      return $farmServer.sessions.delete(this.editForm);
     },
     handleSearch(query){
-      return $farmServer.accounts.search(this.searchForm, query);
+      return $farmServer.sessions.search(this.searchForm, query);
     },
     handleEntities(res){
       this.entitiesTotal = res.page.totalElements;
-      this.entities = res._embedded.accounts;
+      this.entities = res._embedded.sessions;
       return res;
     },
     handleEntity(res){
@@ -379,7 +379,7 @@ export default {
   mounted() {
     this.subtitle = x;
 
-    $stompServer.$stompServer
+    $stompServer.stomp
       .connect()
       .then((r) => {
         console.log(x, "mounted()", 1, r);
