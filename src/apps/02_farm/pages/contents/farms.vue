@@ -1,0 +1,570 @@
+<template>
+  <v-container class="pa-4" fluid>
+    <v-card>
+      <v-card-title class="d-flex align-center pe-2">
+        <v-icon icon="mdi-video-input-component"></v-icon> &nbsp;
+        {{ $t("frontend.contents.farms.title") }}&nbsp;
+        <!-- 
+        //////////////////////////
+        // Search Field Start
+        //////////////////////////
+        -->
+        <v-select
+          class="ms-5"
+          v-model="searchForm.option"
+          density="compact"
+          :items="config.searchOptions"
+          item-title="text"
+          item-value="value"
+          label="Option"
+          variant="solo-filled"
+          flat
+          hide-details
+          single-line
+          style="max-width: 7em;"
+        ></v-select>
+        <v-text-field
+          class="ms-1"
+          v-model="searchForm.keyword"
+          density="compact"
+          label="Search"
+          prepend-inner-icon="mdi-magnify"
+          variant="solo-filled"
+          flat
+          hide-details
+          single-line
+        ></v-text-field>
+        <!-- 
+        //////////////////////////
+        // Search Field End
+        //////////////////////////
+        -->
+      </v-card-title>
+
+      <v-divider></v-divider>
+
+      <v-data-table-server
+        fixed-header
+        density="compact"
+        :loading="loading"
+        :search="config.searchBy"
+        :page="1"
+        :items-per-page="20"
+        :sort-by="config.sortBy"
+        :items-per-page-options="config.itemsPerPageOptions"
+        :headers="config.headers"
+        :item-value="config.itemValue"
+        :items-length="entitiesTotal"
+        :items="entities"
+        @update:options="searchAction"
+      >
+        <!-- 
+        //////////////////////////
+        # Table Cell Template Start
+        //////////////////////////
+        -->
+        <template v-slot:item.id="{ item }">
+          <v-btn
+            variant="plain"
+            color="primary"
+            :text="item.id"
+            style="text-transform: none"
+            @click="readAction(item)"
+          ></v-btn>
+        </template>
+        <template v-slot:item.farmDevices="{ item }">
+          {{ item.farmDevices ? item.farmDevices.farmDeviceSerial : "-" }}
+        </template>
+        <template v-slot:item.farmPlants="{ item }">
+          {{ item.farmPlants ? item.farmPlants.farmPlantName : "-" }}
+        </template>
+        <!-- 
+        //////////////////////////
+        # Table Cell Template End
+        //////////////////////////
+        -->
+
+        <template v-slot:footer.prepend>
+          <v-btn class="ms-1" text variant="elevated" @click="refreshAction">
+            <v-icon>mdi-refresh</v-icon>
+          </v-btn>
+
+          <v-btn
+            class="ms-1"
+            text
+            variant="elevated"
+            color="primary"
+            @click="newAction">
+            <v-icon>mdi-plus</v-icon>
+          </v-btn>
+          <v-spacer></v-spacer>
+        </template>
+      </v-data-table-server>
+
+      <v-dialog v-model="dialog" persistent width="800">
+        <v-card
+          prepend-icon="mdi-update"
+          :title="$t('frontend.contents.farms.title')"
+          :subtitle="editForm.farmName"
+        >
+          <v-card-text>
+            <v-form validate-on="eager" @update:model-value="dialogValidate">
+              <!-- 
+              //////////////////////////
+              # Edit Form Start
+              //////////////////////////
+              -->
+              <v-text-field
+                v-model="editForm.farmName"
+                :rules="[$rules.requried]"
+                label="Name"
+                placeholder="name"
+                hint="......."
+                variant="outlined"
+              ></v-text-field>
+              <v-text-field
+                v-model="editForm.farmOwner"
+                :rules="[$rules.requried]"
+                label="Owner"
+                placeholder="owner"
+                hint="......."
+                variant="outlined"
+              ></v-text-field>
+              <v-text-field
+                v-model="editForm.farmLocation"
+                :rules="[$rules.requried]"
+                label="Location"
+                placeholder="location"
+                hint="......."
+                variant="outlined"
+              ></v-text-field>
+              <entity-field
+                class="ma-2"
+                v-model="editForm.farmPlantLinks"
+                :rules="[$rules.requried]"
+                :items="farmPlantsItems"
+                :item-selected="editForm.farmPlants"
+                :item-title="farmPlantsItemsTitle"
+                :item-value="ffarmPlantsItemsValue"
+                :loading="farmPlantsItemsLoading"
+                @querySelections="farmPlantsItemsQuery"
+                density="default"
+                varient="outlined"
+                placeholder="Farm Plants"
+                hint="......."
+                multiple
+                chips
+              >
+              </entity-field>
+              <entity-field
+                class="ma-2"
+                v-model="editForm.farmDeviceLinks"
+                :rules="[$rules.requried]"
+                :items="farmDevicesItems"
+                :item-selected="editForm.farmDevices"
+                :item-title="farmDevicesItemsTitle"
+                :item-value="farmDevicesItemsValue"
+                :loading="farmDevicesItemsLoading"
+                @querySelections="farmDevicesItemsQuery"
+                density="default"
+                varient="outlined"
+                placeholder="Farm Devices"
+                hint="......."
+                multiple
+                chips
+              >
+              </entity-field>
+              <!-- 
+              //////////////////////////
+              # Edit Form End
+              //////////////////////////
+              -->
+            </v-form>
+          </v-card-text>
+
+          <v-card-actions>
+            <v-btn
+              class="ms-5"
+              variant="elevated"
+              color="primary"
+              text="Save"
+              :disabled="!validate"
+              @click="isNew ? createAction(e) : updateAction(e)"
+            ></v-btn>
+            <v-btn text="Cancel" @click="cancelAction"></v-btn>
+
+            <v-spacer></v-spacer>
+            <v-btn
+              v-if="!isNew"
+              color="error"
+              text="Delete"
+              variant="text"
+              @click="deleteAction"
+            ></v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-card>
+  </v-container>
+</template>
+
+
+
+<script>
+const x = "[/contents/farms]";
+import $farmServer from "@@/assets/apis/farm-server.js";
+import $common from "@@/assets/stores/common";
+
+export default {
+  data: () => ({
+    loading: false,
+    dialog: false,
+    isNew: false,
+    validate: false,
+
+    searchForm: {
+      keyword: '', option: 'farmAll'
+    },
+    editForm: {},
+
+    entities: [],
+    entitiesTotal: 0,
+
+    config: {
+      searchBy: "",
+      itemsPerPageOptions: [
+        { value: 10, title: "10" },
+        { value: 20, title: "20" },
+        { value: 50, title: "50" },
+        { value: 100, title: "100" },
+      ],
+      searchOptions: [
+        { value: 'farmAll', text: '전체' },
+        { value: 'farmName', text: '이름' },
+        { value: 'farmOwner', text: '소유주' },
+        { value: 'farmLocation', text: '위치' },
+      ],
+
+      ///////////////////////////////
+      // Config Start
+      ///////////////////////////////
+      itemValue: "id",
+
+      headers: [
+        { key: "id", title: "id", align: "start" },
+        { key: "farmName", title: "Name", align: "start" },
+        { key: "farmOwner", title: "Owner", align: "center" },
+        { key: "farmLocation", title: "Location", align: "center" },
+        { key: "farmPlants", title: "Farm Plants", align: "end" },
+        { key: "farmDevices", title: "Farm Devices", align: "end" },
+      ],
+      sortBy: [
+        {key: "id", order: "desc" }
+      ],
+
+      initForm: {
+        id: undefined,
+        farmName: undefined,
+        farmOwner: undefined,
+        farmPlants: [],
+        farmDevices: [],
+      }
+      /////////////////////////////////
+      // Config End
+      /////////////////////////////////
+    },
+    farmDevicesItems : [],
+    farmDevicesItemsValue: "id",
+    farmDevicesItemsTitle: "farmDeviceSerial",
+    farmDevicesItemsLoading: false,
+
+    farmPlantsItems : [],
+    farmPlantsItemsValue: "id",
+    farmPlantsItemsTitle: "farmPlantName",
+    farmPlantsItemsLoading: false,
+  }),
+
+  watch: {
+    searchForm: {
+      handler(e) {
+        this.refreshAction();
+      },
+      deep: true,
+    },
+  },
+
+  computed: {
+    subtitle: $common.computed.subtitle,
+    userinfo : $common.computed.userinfo,
+  },
+
+  methods: {
+
+    ////////////////////////////////////////
+    // query....
+    ////////////////////////////////////////
+    farmDevicesItemsQuery(v){
+      console.log(x, "farmDevicesItemsQuery", 1, v);
+      this.farmDevicesItemsLoading = true;
+
+      $farmServer.farmDevices.search({}, {})
+      .then(r => {
+        console.log(x, "farmDevicesItemsQuery", 2, r);
+        this.farmDevicesItems = r._embedded.farmDevices;
+        this.farmDevicesItemsLoading = false;
+      })
+      .catch(r => {
+
+      });
+    },
+
+    farmPlantsItemsQuery(v){
+      console.log(x, "farmPlantsItemsQuery", 1, v);
+      this.farmPlantsItemsLoading = true;
+
+      $farmServer.farmPlants.search({}, {})
+      .then(r => {
+        console.log(x, "farmPlantsItemsQuery", 2, r);
+        this.farmPlantsItems = r._embedded.farmPlants;
+        this.farmPlantsItemsLoading = false;
+      })
+      .catch(r => {
+
+      });
+    },
+    ////////////////////////////////////////
+    // handle....
+    ////////////////////////////////////////
+    handleCreate(){
+      return $farmServer.farms.create(this.editForm);
+    },
+    handleRead(entity){
+      return $farmServer.farms.read(entity);
+    },
+    handleUpdate(){
+      return $farmServer.farms.update(this.editForm);
+    },
+    handleDelete(){
+      return $farmServer.farms.delete(this.editForm);
+    },
+    handleSearch(query){
+      return $farmServer.farms.search(this.searchForm, query);
+    },
+    handleEntities(res){
+      this.entitiesTotal = res.page.totalElements;
+      this.entities = res._embedded.farms;
+      return res;
+    },
+    handleEntity(res){
+      this.editForm = res ? res : Object.assign({}, this.config.initForm);
+      return res;
+    },
+
+    ////////////////////////////////////////
+    //
+    ////////////////////////////////////////
+    dialogOpen(isNew) {
+      this.dialog = true;
+      this.isNew = isNew;
+      return "opened";
+    },
+    dialogClose() {
+      this.dialog = false;
+      this.isNew = false;
+      return "closed";
+    },
+    dialogValidate(r){
+      this.validate = r;
+    },
+
+    ////////////////////////////////////////
+    //
+    ////////////////////////////////////////
+    confirmBefore(code) {
+      let msg = this.$t(`$dialog.before.${code}`);
+      return this.$dialog.confirm(msg);
+    },
+    confirmAfter(code) {
+      let msg = this.$t(`$dialog.after.${code}`);
+      return this.$dialog.alert(msg);
+    },
+    confirmError(code) {
+      let msg = this.$t(`$dialog.error.${code}`);
+      return this.$dialog.alert(msg, code);
+    },
+
+    ////////////////////////////////////////
+    //
+    ////////////////////////////////////////    
+    actionStart(loading) {
+      this.loading = true == loading ? true : false;
+      return Promise.resolve();
+    },
+    actionEnd(refresh) {
+      this.loading = false;
+      if (true == refresh) {
+        this.dialog = false;
+        this.isNew = false;
+        this.refreshAction();
+      }
+    },
+
+    ////////////////////////////////////////
+    //
+    ////////////////////////////////////////
+    refreshAction() {
+      this.config.searchBy = String(Date.now());
+    },
+
+    searchAction(params) {
+      this.actionStart(true)
+        .then((r) => {
+          return this.handleSearch(params);
+        })
+        .then((r) => {
+          return this.handleEntities(r);
+        })
+        .then((r) => {
+          return this.actionEnd(false);
+        })
+        .catch((e) => {
+          return this.confirmError(e);
+        })
+        .catch((e) => {
+          console.log(x, "searchAction", 2, e);
+        });
+    },
+
+    newAction() {
+      this.actionStart(true)
+        .then((r) => {
+          return this.handleEntity();
+        })
+        .then((r) => {
+          return this.dialogOpen(true);
+        })
+        .then((r) => {
+          return this.actionEnd(false);
+        });
+    },
+
+    cancelAction() {
+      this.actionStart(true)
+        .then((r) => {
+          return this.dialogClose();
+        })
+        .then((r) => {
+          return this.handleEntity();
+        })
+        .then((r) => {
+          return this.actionEnd(false);
+        });
+    },
+
+    createAction() {
+      this.confirmBefore("create")
+        .then((r) => {
+          return this.actionStart(true);
+        })
+        .then((r) => {
+          return this.handleCreate();
+        })
+        .then((r) => {
+          return this.confirmAfter("create");
+        })
+        .then((r) => {
+          return this.handleEntity();
+        })
+        .then((r) => {
+          return this.actionEnd(true);
+        })
+        .catch((r) => {
+          return this.confirmError(r);
+        })
+        .catch((r) => {
+          return this.actionEnd(true);
+        });
+    },
+
+    readAction(entity) {
+      this.actionStart(true)
+        .then((r) => {
+          return this.handleRead(entity);
+        })
+        .then((r) => {
+          return this.handleEntity(r);
+        })
+        .then((e) => {
+          return this.dialogOpen(false);
+        })
+        .then((e) => {
+          return this.actionEnd(false);
+        })
+        .catch((e) => {
+          return this.confirmError(e);
+        })
+        .catch((e) => {
+          return this.actionEnd(true);
+        });
+    },
+
+    updateAction() {
+      this.confirmBefore("update")
+        .then((r) => {
+          return this.actionStart(true);
+        })
+        .then((r) => {
+          return this.handleUpdate();
+        })
+        .then((r) => {
+          console.log(1);
+          return this.confirmAfter("update");
+        })
+        .then((r) => {
+          console.log(2);
+          return this.handleEntity();
+        })
+        .then((r) => {
+          console.log(3);
+          return this.actionEnd(true);
+        })
+        .catch((r) => {
+          console.log(4);
+          return this.confirmError(r);
+        })
+        .catch((r) => {
+          return this.actionEnd(true);
+        });
+    },
+
+    deleteAction() {
+      this.confirmBefore("delete")
+        .then((r) => {
+          return this.actionStart(true);
+        })
+        .then((r) => {
+          return this.handleDelete();
+        })
+        .then((r) => {
+          return this.confirmAfter("delete");
+        })
+        .then((r) => {
+          return this.handleEntity();
+        })
+        .then((r) => {
+          return this.actionEnd(true);
+        })
+        .catch((r) => {
+          return this.confirmError(r);
+        })
+        .catch((r) => {
+          return this.actionEnd(true);
+        });
+    },
+  },
+
+  mounted() {
+    this.subtitle = x;
+  },
+};
+</script>
